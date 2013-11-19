@@ -1,4 +1,4 @@
 YapKit
 ======
 
-Yap Studios' Core Component Library
+Yap Studios Core Component Library
