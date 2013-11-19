@@ -5,7 +5,7 @@ Pod::Spec.new do |s|
   s.homepage     = "http://yapstudios.com/"
   s.license      = 'None'
   s.author       = { "Yap Studios" => "contact@yapstudios.com" }
-  s.source       = { :git => "https://github.com/yapstudios/YapKit.git", :tag => s.version.to_s }
+  s.source       = { :git => "https://github.com/yapstudios/YapKit.git" }
   s.requires_arc = true
 
   s.ios.deployment_target = '7.0'
