@@ -210,9 +210,9 @@
 	}
 	
 	// get the transition view and to/from frame from the animation controller delegate
-	_transitionViewFromFrame = [(id <YapAnimationControllerDelegate>) _fromViewController transitionViewRectInView:containerView];
-	_transitionViewToFrame = [(id <YapAnimationControllerDelegate>) _toViewController transitionViewRectInView:containerView];
-	_transitionView = [(id <YapAnimationControllerDelegate>) _fromViewController transitionView];
+	_transitionViewFromFrame = [(id <YapAnimationControllerDelegate>) _fromViewController animationController:self transitionViewRectInView:containerView toViewController:_toViewController];
+	_transitionViewToFrame = [(id <YapAnimationControllerDelegate>) _toViewController animationController:self transitionViewRectInView:containerView fromViewController:_fromViewController];
+	_transitionView = [(id <YapAnimationControllerDelegate>) _fromViewController animationController:self transitionViewToViewController:_toViewController];
 	_transitionView.frame = _transitionViewFromFrame;
 	[containerView addSubview:_transitionView];
 	
@@ -227,7 +227,8 @@
 		.height = fromRect.size.height + percentComplete * (toRect.size.height - fromRect.size.height)
 	};
 
-#ifdef CENTER_TRACKS_ANIMATION
+#define DISABLE_PINCH_ROTATE
+#ifdef DISABLE_PINCH_ROTATE
 	// use this to have the exit animation follow the same path as the intro animation
 	CGPoint toCenter = (CGPoint) { CGRectGetMidX(toRect), CGRectGetMidY(toRect) };
 	return (CGRect) {
@@ -255,7 +256,9 @@
 	
 	CGRect lerpToFrame = [self lerpToFrameFromRect:_transitionViewFromFrame toRect:_transitionViewToFrame percentComplete:percentComplete offset:offset];
 	
+#ifndef DISABLE_PINCH_ROTATE
 	_transitionView.layer.transform = CATransform3DMakeRotation(angle, 0.0, 0.0, 1.0); // rotate on z to match pinch gesture
+#endif
 	_transitionView.layer.position = (CGPoint) {
 		.x = CGRectGetMidX(lerpToFrame),
 		.y = CGRectGetMidY(lerpToFrame),

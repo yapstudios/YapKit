@@ -25,8 +25,9 @@ const static CGFloat kYapAnimationControllerDuration = SLOW_MO;
 
 // this is the transition view that will be used to animate;
 // TODO: add a protocol for bouncy transitionView subview transitions
-- (UIView *)transitionView;
-- (CGRect)transitionViewRectInView:(UIView *)view;
+- (UIView *)animationController:(YapAnimationController *)animationController transitionViewToViewController:(id <YapAnimationControllerDelegate>)toViewController;
+- (CGRect)animationController:(YapAnimationController *)animationController  transitionViewRectInView:(UIView *)view fromViewController:(id <YapAnimationControllerDelegate>)fromViewController;
+- (CGRect)animationController:(YapAnimationController *)animationController  transitionViewRectInView:(UIView *)view toViewController:(id <YapAnimationControllerDelegate>)toViewController;
 
 @optional
 
