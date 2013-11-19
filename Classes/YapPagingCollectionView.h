@@ -45,6 +45,9 @@
 @protocol YapPagingCollectionViewDelegate <NSObject>
 
 @optional
+- (BOOL)pagingCollectionViewPagingEnabled:(YapPagingCollectionView *)pagingCollectionView;
+- (void)pagingCollectionViewWillBeginPanning:(YapPagingCollectionView *)pagingCollectionView;
+// TODO: clean up protocol name to match YapPagingCollectionViewDelegate (was horizontalImageCollectionView)
 - (void)horizontalImageCollectionViewDidEndPanning:(YapPagingCollectionView *)horizontalImageCollectionView willPageToPage:(NSInteger)page;
 - (void)horizontalImageCollectionView:(YapPagingCollectionView *)horizontalImageCollectionView didPageToPage:(NSInteger)page;
 - (void)horizontalImageCollectionViewDidScroll:(YapPagingCollectionView *)horizontalImageCollectionView;

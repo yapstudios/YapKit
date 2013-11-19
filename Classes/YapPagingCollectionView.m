@@ -17,7 +17,6 @@
 
 	CGFloat _beginOffsetX;
 	CGFloat _beginPagingOffsetX; // start of paging gesture rec
-	BOOL _isAnimating;
 	BOOL _isPaging;
 
 	NSMutableSet *_hiddenImages;
@@ -74,8 +73,9 @@
 - (CGRect)rectForImageAtIndex:(NSUInteger)index inView:(UIView *)view
 {
 	if (index < _numberOfItems) {
-		UICollectionViewCell *cell = (UICollectionViewCell *) [_cv cellForItemAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
-		return [cell convertRect:cell.bounds toView:view];
+		UICollectionViewLayoutAttributes *layoutAttributes = [_flowLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
+		CGRect rect = [_cv convertRect:layoutAttributes.frame toView:view];
+		return rect;
 	}
 	return CGRectZero;
 }
@@ -122,6 +122,7 @@
 			_customGestureRecognizer = [[UIPanGestureRecognizer alloc] init];
 			[_customGestureRecognizer addTarget:self action:@selector(handleHorizontalPan:)];
 			_customGestureRecognizer.delegate = self;
+			_customGestureRecognizer.delaysTouchesBegan = YES;
 			[_cv addGestureRecognizer:_customGestureRecognizer];
 		}
 	} else {
@@ -227,7 +228,7 @@
 {
 	_page = page;
 	
-	CGFloat duration = 1.0;
+	CGFloat duration = 0.5;
 	CGRect bounds = _cv.layer.bounds;
 	bounds.origin.x = page * _pageWidth - _cv.contentInset.left;
 	//bounds.origin.x = fmax(0.0, fmin(bounds.origin.x, _cv.contentSize.width - _cv.bounds.size.width));
@@ -243,23 +244,9 @@
 			//[_cv setContentOffset:bounds.origin animated:NO];
 			if ([_delegate respondsToSelector:@selector(horizontalImageCollectionView:didPageToPage:)])
 				[_delegate horizontalImageCollectionView:self didPageToPage:page];
+			_isPaging = NO;
 		}];
 		
-//		OWBounceInterpolation *spring = [[OWBounceInterpolation alloc] init];
-//		spring.tension = 200.0f;
-//		spring.friction = 20.0f;
-//		
-//		CAKeyframeAnimation *bounceAnimation = [CAKeyframeAnimation animationWithKeyPath:@"bounds.origin.x"];
-//		bounceAnimation.duration = duration;
-//		spring.fromValue = [[_cv.layer valueForKeyPath:@"bounds.origin.x"] floatValue];
-//		spring.toValue = bounds.origin.x;
-//		bounceAnimation.values = [spring arrayOfInterpolatedValues];
-//		bounceAnimation.calculationMode = kCAAnimationLinear;
-//		bounceAnimation.fillMode = kCAFillModeBoth;
-//		bounceAnimation.removedOnCompletion = YES;
-		
-//		[_cv.layer addAnimation:bounceAnimation forKey:@"bounds.origin.x"];
-
 		CAKeyframeAnimation *animation = [_cv bouncyAnimationForKeyPath:@"bounds.origin.x"
 															  fromValue:[_cv.layer valueForKeyPath:@"bounds.origin.x"]
 																toValue:@(bounds.origin.x)
@@ -272,7 +259,7 @@
 		
 	} else {
 		[_cv setContentOffset:bounds.origin animated:NO];
-		
+		_isPaging = NO;
 	}
 	
 }
@@ -289,56 +276,68 @@
 	
 	if (inPanRecognizer.state == UIGestureRecognizerStateBegan) {
 		
-		_isPaging = YES;
-		//			if ([_delegate respondsToSelector:@selector(pagingTableViewWillBeginPanning:)])
-		//				[_delegate pagingTableViewWillBeginPanning:self];
+		_isPaging = NO; // hold until 10px threshold is hit
+				
 		_beginOffsetX = [inPanRecognizer locationInView:self].x;
 		_page = (_cv.contentOffset.x + _cv.contentInset.left) / _pageWidth;
 		_beginPagingOffsetX = _page * _pageWidth - _cv.contentInset.left;
-		[self removeAllAnimations];
 		
 	} else if (inPanRecognizer.state == UIGestureRecognizerStateChanged) {
 		
 		offsetX = [inPanRecognizer locationInView:self].x - _beginOffsetX;
 		
-		CGFloat drag = 1.0;
-		if ((_page == 0 && offsetX > 0.0) || (_page == maxPage && offsetX < 0.0)) {
-			drag = 0.5;
+		if (!_isPaging && (fabs(offsetX) > 5.0)) {
+			if ([_delegate respondsToSelector:@selector(pagingCollectionViewPagingEnabled:)]) {
+				_isPaging = [_delegate pagingCollectionViewPagingEnabled:self];
+			} else {
+				_isPaging = YES;
+			}
+			
+			if (_isPaging) {
+				[self removeAllAnimations];
+				if ([_delegate respondsToSelector:@selector(pagingCollectionViewWillBeginPanning:)])
+					[_delegate pagingCollectionViewWillBeginPanning:self];
+				
+			}
 		}
 		
-		//NSLog(@"offsetX:%f isPaging:%d page:%d drag:%f", offsetX, _isPaging, _page, drag);
-				
-		_cv.contentOffset = (CGPoint) { .x = _beginPagingOffsetX - drag * offsetX };
+		if (_isPaging) {
+			CGFloat drag = 1.0;
+			if ((_page == 0 && offsetX > 0.0) || (_page == maxPage && offsetX < 0.0)) {
+				drag = 0.5;
+			}
+		
+			//NSLog(@"offsetX:%f isPaging:%d page:%d drag:%f", offsetX, _isPaging, _page, drag);
 			
-//			if ([_delegate respondsToSelector:@selector(pagingTableViewDidPan:)])
-//				[_delegate pagingTableViewDidPan:self];
+			_cv.contentOffset = (CGPoint) { .x = _beginPagingOffsetX - drag * offsetX };
+			
+		}
 		
 	} else if (inPanRecognizer.state == UIGestureRecognizerStateEnded || inPanRecognizer.state == UIGestureRecognizerStateCancelled) {
-		
-		NSUInteger newPage = _page;		
-		CGPoint velocity = [inPanRecognizer velocityInView:self];
-		
-		offsetX = [inPanRecognizer locationInView:self].x - _beginOffsetX;
-		
-		if ((newPage > 0) && (velocity.x > velocityThreshold)) {
-			//NSLog(@"VELOCITY L: %f", velocity.x);
-			newPage--;
-		} else if ((newPage < maxPage) && (velocity.x < -velocityThreshold)) {
-			//NSLog(@"VELOCITY R: %f", velocity.x);
-			newPage++;
-		} else if (newPage > 0 && offsetX > pagingThreshold) {
-			newPage--;
-		} else if (newPage < maxPage && offsetX < -pagingThreshold) {
-			newPage++;
+		if (_isPaging) {
+			NSUInteger newPage = _page;
+			CGPoint velocity = [inPanRecognizer velocityInView:self];
+			
+			offsetX = [inPanRecognizer locationInView:self].x - _beginOffsetX;
+			
+			if ((newPage > 0) && (velocity.x > velocityThreshold)) {
+				//NSLog(@"VELOCITY L: %f", velocity.x);
+				newPage--;
+			} else if ((newPage < maxPage) && (velocity.x < -velocityThreshold)) {
+				//NSLog(@"VELOCITY R: %f", velocity.x);
+				newPage++;
+			} else if (newPage > 0 && offsetX > pagingThreshold) {
+				newPage--;
+			} else if (newPage < maxPage && offsetX < -pagingThreshold) {
+				newPage++;
+			}
+			
+			// notify delegate about to page
+			if ([_delegate respondsToSelector:@selector(horizontalImageCollectionViewDidEndPanning:willPageToPage:)])
+				[_delegate horizontalImageCollectionViewDidEndPanning:self willPageToPage:newPage];
+			
+			[self setPage:newPage animated:YES];
 		}
-		
-		// notify delegate about to page
-		if ([_delegate respondsToSelector:@selector(horizontalImageCollectionViewDidEndPanning:willPageToPage:)])
-			[_delegate horizontalImageCollectionViewDidEndPanning:self willPageToPage:newPage];
-		
-		[self setPage:newPage animated:YES];
-		
-		_isPaging = NO;
 	}
 }
 
@@ -348,9 +347,12 @@
 	NSUInteger index = (offsetX - _flowLayout.sectionInset.left / 2.0) / (_flowLayout.itemSize.width + _flowLayout.minimumLineSpacing);
 	//NSLog(@"TAP %d", index);
 	
-	if ([_delegate respondsToSelector:@selector(horizontalImageCollection:didTapImageAtIndex:)]) {
-		[_delegate horizontalImageCollection:self didTapImageAtIndex:index];
+	if (!_isPaging) {
+		if ([_delegate respondsToSelector:@selector(horizontalImageCollection:didTapImageAtIndex:)]) {
+			[_delegate horizontalImageCollection:self didTapImageAtIndex:index];
+		}
 	}
+	
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView

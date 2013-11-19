@@ -23,8 +23,6 @@
 // bounce view to a new frame
 - (void)bounceToFrame:(CGRect)frame duration:(CFTimeInterval)duration
 {
-	duration *= SLOW_MO;
-	
 	if (CGRectEqualToRect(frame, self.frame)) return; // no animation required!
 
 	CGPoint startPosition = (CGPoint) {
