@@ -19,6 +19,8 @@
 	id<UIViewControllerContextTransitioning> _context;
     UIViewController <YapAnimationControllerDelegate> *_fromViewController;
     UIViewController <YapAnimationControllerDelegate> *_toViewController;
+    UIViewController <YapAnimationControllerDelegate> *_presentingFromViewController;
+    UIViewController <YapAnimationControllerDelegate> *_presentingToViewController;
 	UIView *_transitionView;
 	CGRect _transitionViewFromFrame;
 	CGRect _transitionViewToFrame;
@@ -46,13 +48,13 @@
 		NSLog(@"CA ANIMATION COMPLETE %@", _transitionView);
 		
 		// notify animation delegate handlers
-		if ([_toViewController respondsToSelector:@selector(animationControllerDidAnimateTransition:)]) {
-			[_toViewController animationControllerDidAnimateTransition:self];
+		if ([_presentingToViewController respondsToSelector:@selector(animationControllerDidAnimateTransition:)]) {
+			[_presentingToViewController animationControllerDidAnimateTransition:self];
 		}
-		if ([_fromViewController respondsToSelector:@selector(animationControllerDidAnimateTransition:)]) {
-			[_fromViewController animationControllerDidAnimateTransition:self];
+		if ([_presentingFromViewController respondsToSelector:@selector(animationControllerDidAnimateTransition:)]) {
+			[_presentingFromViewController animationControllerDidAnimateTransition:self];
 		}
-
+		
 		[_transitionView removeFromSuperview];
 	}];
 	
@@ -67,11 +69,11 @@
 						 _toViewController.view.alpha = 1.0;
 						 
 						 // notify animation delegate handlers
-						 if ([_toViewController respondsToSelector:@selector(animationControllerWillAnimateTransition:)]) {
-							 [_toViewController animationControllerWillAnimateTransition:self];
+						 if ([_presentingToViewController respondsToSelector:@selector(animationControllerWillAnimateTransition:)]) {
+							 [_presentingToViewController animationControllerWillAnimateTransition:self];
 						 }
-						 if ([_fromViewController respondsToSelector:@selector(animationControllerWillAnimateTransition:)]) {
-							 [_fromViewController animationControllerWillAnimateTransition:self];
+						 if ([_presentingFromViewController respondsToSelector:@selector(animationControllerWillAnimateTransition:)]) {
+							 [_presentingFromViewController animationControllerWillAnimateTransition:self];
 						 }
 					 } completion:^(BOOL finished) {
 						 // completion handled by CATransaction completion block above
@@ -186,9 +188,15 @@
 
 - (void)prepareAnimationTransition:(id<UIViewControllerContextTransitioning>)transitionContext
 {
-    // 1. obtain state from the context
-    _toViewController = (UIViewController <YapAnimationControllerDelegate> *) [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
-    _fromViewController = (UIViewController <YapAnimationControllerDelegate> *) [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
+    _toViewController = _presentingToViewController = (UIViewController <YapAnimationControllerDelegate> *) [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
+	if ([_toViewController respondsToSelector:@selector(presentingAnimationViewController)]) {
+		_presentingToViewController = [_toViewController presentingAnimationViewController];
+	}
+    _fromViewController = _presentingFromViewController = (UIViewController <YapAnimationControllerDelegate> *) [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
+	if ([_fromViewController respondsToSelector:@selector(presentingAnimationViewController)]) {
+		_presentingFromViewController = [_fromViewController presentingAnimationViewController];
+	}
+	
     CGRect finalFrame = [transitionContext finalFrameForViewController:_toViewController];
     
     // 2. obtain the container view
@@ -202,17 +210,17 @@
     [containerView addSubview:_toViewController.view];
 	
 	// notify animation delegate handlers
-	if ([_toViewController respondsToSelector:@selector(animationControllerPreparingForAnimationTransition:)]) {
-		[_toViewController animationControllerPreparingForAnimationTransition:self];
+	if ([_presentingToViewController respondsToSelector:@selector(animationControllerPreparingForAnimationTransition:)]) {
+		[_presentingToViewController animationControllerPreparingForAnimationTransition:self];
 	}
-	if ([_fromViewController respondsToSelector:@selector(animationControllerPreparingForAnimationTransition:)]) {
-		[_fromViewController animationControllerPreparingForAnimationTransition:self];
+	if ([_presentingFromViewController respondsToSelector:@selector(animationControllerPreparingForAnimationTransition:)]) {
+		[_presentingFromViewController animationControllerPreparingForAnimationTransition:self];
 	}
 	
 	// get the transition view and to/from frame from the animation controller delegate
-	_transitionViewFromFrame = [(id <YapAnimationControllerDelegate>) _fromViewController animationController:self transitionViewRectInView:containerView toViewController:_toViewController];
-	_transitionViewToFrame = [(id <YapAnimationControllerDelegate>) _toViewController animationController:self transitionViewRectInView:containerView fromViewController:_fromViewController];
-	_transitionView = [(id <YapAnimationControllerDelegate>) _fromViewController animationController:self transitionViewToViewController:_toViewController];
+	_transitionViewFromFrame = [(id <YapAnimationControllerDelegate>) _presentingFromViewController animationController:self transitionViewRectInView:containerView toViewController:_presentingToViewController];
+	_transitionViewToFrame = [(id <YapAnimationControllerDelegate>) _presentingToViewController animationController:self transitionViewRectInView:containerView fromViewController:_presentingFromViewController];
+	_transitionView = [(id <YapAnimationControllerDelegate>) _presentingFromViewController animationController:self transitionViewToViewController:_presentingToViewController];
 	_transitionView.frame = _transitionViewFromFrame;
 	[containerView addSubview:_transitionView];
 	
@@ -278,19 +286,19 @@
 		// 6. inform the context of completion
 		NSLog(@"CA ANIMATION COMPLETE %@", _transitionView);
 		_transitionView.alpha = 0.0;
-
+		
 		[_context cancelInteractiveTransition];
 		[_context completeTransition:NO];
-				
+		
 		// notify animation delegate handlers
 		// TODO: add cancel BOOL to delegate
-		if ([_toViewController respondsToSelector:@selector(animationControllerDidAnimateTransition:)]) {
-			[_toViewController animationControllerDidAnimateTransition:self];
+		if ([_presentingToViewController respondsToSelector:@selector(animationControllerDidAnimateTransition:)]) {
+			[_presentingToViewController animationControllerDidAnimateTransition:self];
 		}
-		if ([_fromViewController respondsToSelector:@selector(animationControllerDidAnimateTransition:)]) {
-			[_fromViewController animationControllerDidAnimateTransition:self];
+		if ([_presentingFromViewController respondsToSelector:@selector(animationControllerDidAnimateTransition:)]) {
+			[_presentingFromViewController animationControllerDidAnimateTransition:self];
 		}
-
+		
 		// cleanup
 		[self cleanupInteractiveTransition];
 		
@@ -322,16 +330,16 @@
 		[_context completeTransition:YES];
 		
 		// notify animation delegate handlers
-		if ([_toViewController respondsToSelector:@selector(animationControllerDidAnimateTransition:)]) {
-			[_toViewController animationControllerDidAnimateTransition:self];
+		if ([_presentingToViewController respondsToSelector:@selector(animationControllerDidAnimateTransition:)]) {
+			[_presentingToViewController animationControllerDidAnimateTransition:self];
 		}
-		if ([_fromViewController respondsToSelector:@selector(animationControllerDidAnimateTransition:)]) {
-			[_fromViewController animationControllerDidAnimateTransition:self];
+		if ([_presentingFromViewController respondsToSelector:@selector(animationControllerDidAnimateTransition:)]) {
+			[_presentingFromViewController animationControllerDidAnimateTransition:self];
 		}
-
+		
 		// cleanup
 		[self cleanupInteractiveTransition];
-	
+		
 	}];
 	
 	[_transitionView bounceToFrame:_transitionViewToFrame duration:duration];
@@ -355,6 +363,8 @@
 	_context = nil;
 	_toViewController = nil;
 	_fromViewController = nil;
+	_presentingToViewController = nil;
+	_presentingFromViewController = nil;
 	
 	[_transitionView removeFromSuperview];
 	_transitionView = nil;
