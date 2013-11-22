@@ -25,7 +25,8 @@
 - (void)setPage:(NSUInteger)page animated:(BOOL)animated;
 - (NSUInteger)pageForItemAtIndex:(NSUInteger)index;
 @property (nonatomic, assign) CGSize itemSize; // default 192 x 64
-@property (nonatomic, assign) UIEdgeInsets contentInset;
+@property (nonatomic, readonly) UIEdgeInsets contentInset;
+@property (nonatomic, assign) CGPoint contentOffset;
 @property (nonatomic, assign) CGFloat interitemSpacing;
 @property (nonatomic, assign) BOOL scrollEnabled;
 

@@ -87,11 +87,19 @@
 	[_cv reloadData];
 }
 
-- (void)setContentInset:(UIEdgeInsets)contentInset
+- (UIEdgeInsets)contentInset
 {
-	_contentInset = contentInset;
-	_flowLayout.sectionInset = _contentInset;
-	[_cv reloadData];
+	return _cv.contentInset;
+}
+
+- (CGPoint)contentOffset
+{
+	return _cv.contentOffset;
+}
+
+- (void)setContentOffset:(CGPoint)contentOffset
+{
+	_cv.contentOffset = contentOffset;
 }
 
 - (void)setInteritemSpacing:(CGFloat)interitemSpacing
@@ -156,21 +164,21 @@
 		// create flow layout
 		_flowLayout = [[UICollectionViewFlowLayout alloc] init];
         _flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-        _flowLayout.sectionInset = (UIEdgeInsets) { .top = 16.0, .bottom = 16.0, .left = 16.0, .right = 16.0 };
+        _flowLayout.sectionInset = (UIEdgeInsets) { .top = 0.0, .bottom = 0.0, .left = 0.0, .right = 0.0 };
 
         _flowLayout.minimumLineSpacing = 16.0;
         _flowLayout.itemSize = (CGSize) { .width = 192.0, .height = 64.0 };
     
 		// create collection view
 		CGRect rect = (CGRect) {
-			.origin.x = -frame.size.width,
-			.size.width = 3 * frame.size.width,
+			.origin.x = -2 * frame.size.width,
+			.size.width = 4 * frame.size.width,
 			.size.height = frame.size.height
 		};
         
 		_cv = [[UICollectionView alloc] initWithFrame:rect collectionViewLayout:_flowLayout];
 		_cv.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin;
-		_cv.contentInset = (UIEdgeInsets) { .left = self.bounds.size.width, .right = self.bounds.size.width };
+		_cv.contentInset = (UIEdgeInsets) { .left = 2 * self.bounds.size.width, .right = self.bounds.size.width };
 		_cv.delegate = self;
 		_cv.dataSource = self;
 		_cv.userInteractionEnabled = YES;
