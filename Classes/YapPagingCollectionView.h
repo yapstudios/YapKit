@@ -27,8 +27,11 @@
 @property (nonatomic, assign) CGSize itemSize; // default 192 x 64
 @property (nonatomic, readonly) UIEdgeInsets contentInset;
 @property (nonatomic, assign) CGPoint contentOffset;
+- (void)setContentOffset:(CGPoint)contentOffset animated:(BOOL)animated;
 @property (nonatomic, assign) CGFloat interitemSpacing;
 @property (nonatomic, assign) BOOL scrollEnabled;
+
+@property (nonatomic, readonly) UICollectionView *collectionView; // TODO: make paging collection view a direct subclass of UICollectionView, or expose more properties
 
 - (void)setImageHidden:(BOOL)hidden atIndex:(NSInteger)index;
 - (NSArray *)visibleCells;
@@ -48,10 +51,12 @@
 @optional
 - (BOOL)pagingCollectionViewPagingEnabled:(YapPagingCollectionView *)pagingCollectionView;
 - (void)pagingCollectionViewWillBeginPanning:(YapPagingCollectionView *)pagingCollectionView;
+- (void)pagingCollectionViewDidScroll:(YapPagingCollectionView *)pagingCollectionView;
+- (void)pagingCollectionViewDidEndDecelerating:(YapPagingCollectionView *)pagingCollectionView;
+
 // TODO: clean up protocol name to match YapPagingCollectionViewDelegate (was horizontalImageCollectionView)
 - (void)horizontalImageCollectionViewDidEndPanning:(YapPagingCollectionView *)horizontalImageCollectionView willPageToPage:(NSInteger)page;
 - (void)horizontalImageCollectionView:(YapPagingCollectionView *)horizontalImageCollectionView didPageToPage:(NSInteger)page;
-- (void)horizontalImageCollectionViewDidScroll:(YapPagingCollectionView *)horizontalImageCollectionView;
 - (void)horizontalImageCollection:(YapPagingCollectionView *)horizontalImageCollectionView didTapImageAtIndex:(NSUInteger)index;
 @end
 

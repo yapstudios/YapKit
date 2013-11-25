@@ -9,6 +9,8 @@
 #import "YapPagingCollectionView.h"
 #import "UIView+YapBouncyAnimations.h"
 
+#define SLOW_MO 0.5
+
 @implementation YapPagingCollectionView {
 	UICollectionView *_cv;
 	UICollectionViewFlowLayout *_flowLayout;
@@ -23,6 +25,13 @@
 	
 	UIPanGestureRecognizer *_customGestureRecognizer;
 	UITapGestureRecognizer *_customTapRecognizer;
+	
+	BOOL _isAnimating;
+}
+
+- (UICollectionView *)collectionView
+{
+	return _cv;
 }
 
 - (void)setImageHidden:(BOOL)hidden atIndex:(NSInteger)index;
@@ -102,6 +111,39 @@
 	_cv.contentOffset = contentOffset;
 }
 
+- (void)setContentOffset:(CGPoint)contentOffset animated:(BOOL)animated
+{
+	CGFloat duration = SLOW_MO;
+	CGRect bounds = _cv.layer.bounds;
+	bounds.origin.x = contentOffset.x;
+	//bounds.origin.x = fmax(0.0, fmin(bounds.origin.x, _cv.contentSize.width - _cv.bounds.size.width));
+	
+	[_cv.layer removeAllAnimations];
+	
+	if (animated) {
+		// bounce back
+		[CATransaction begin];
+		[CATransaction setAnimationDuration:duration];
+		[CATransaction setCompletionBlock:^{
+			_isAnimating = NO;
+		}];
+		
+		CAKeyframeAnimation *animation = [_cv bouncyAnimationForKeyPath:@"bounds.origin.x"
+															  fromValue:[_cv.layer valueForKeyPath:@"bounds.origin.x"]
+																toValue:@(bounds.origin.x)
+															   duration:duration];
+		[_cv.layer addAnimation:animation forKey:@"bounds.origin.x"];
+		
+		
+		[CATransaction commit];
+		_cv.contentOffset = bounds.origin;
+		_isAnimating = YES;
+		
+	} else {
+		[_cv setContentOffset:bounds.origin animated:NO];
+	}
+}
+
 - (void)setInteritemSpacing:(CGFloat)interitemSpacing
 {
 	_interitemSpacing = interitemSpacing;
@@ -123,21 +165,26 @@
 
 - (void)setScrollEnabled:(BOOL)scrollEnabled
 {
-	_scrollEnabled = scrollEnabled;
-	if (_scrollEnabled) {
-		if (!_customGestureRecognizer) {
-			// enable custom paging
-			_customGestureRecognizer = [[UIPanGestureRecognizer alloc] init];
-			[_customGestureRecognizer addTarget:self action:@selector(handleHorizontalPan:)];
-			_customGestureRecognizer.delegate = self;
-			_customGestureRecognizer.delaysTouchesBegan = YES;
-			[_cv addGestureRecognizer:_customGestureRecognizer];
-		}
-	} else {
-		[_cv removeGestureRecognizer:_customGestureRecognizer];
-		_customGestureRecognizer = nil;
-	}
+	_cv.scrollEnabled = YES;
 }
+
+//- (void)setScrollEnabled:(BOOL)scrollEnabled
+//{
+//	_scrollEnabled = scrollEnabled;
+//	if (_scrollEnabled) {
+//		if (!_customGestureRecognizer) {
+//			// enable custom paging
+//			_customGestureRecognizer = [[UIPanGestureRecognizer alloc] init];
+//			[_customGestureRecognizer addTarget:self action:@selector(handleHorizontalPan:)];
+//			_customGestureRecognizer.delegate = self;
+//			_customGestureRecognizer.delaysTouchesBegan = YES;
+//			[_cv addGestureRecognizer:_customGestureRecognizer];
+//		}
+//	} else {
+//		[_cv removeGestureRecognizer:_customGestureRecognizer];
+//		_customGestureRecognizer = nil;
+//	}
+//}
 
 - (void)reloadData
 {
@@ -184,9 +231,9 @@
 		_cv.userInteractionEnabled = YES;
 		
 		// bouncing and scrolling handled by custom gesture recognizer
-		_cv.bounces = NO;
+		_cv.bounces = YES;
 		_cv.alwaysBounceVertical = NO;
-		_cv.alwaysBounceHorizontal = NO;
+		_cv.alwaysBounceHorizontal = YES;
 		_cv.allowsSelection = NO; // needed?
 		_cv.scrollEnabled = NO;
 		_cv.backgroundColor = [UIColor clearColor]; //[UIColor colorWithWhite:0.92 alpha:1.0];
@@ -217,8 +264,6 @@
     return _numberOfItems;
 }
 
-
-
 - (UICollectionViewCell *)collectionView:(UICollectionView *)cv cellForItemAtIndexPath:(NSIndexPath *)indexPath;
 {
 	UICollectionViewCell *cell = [_dataSource collectionView:self itemAtIndexPath:indexPath];
@@ -236,7 +281,7 @@
 {
 	_page = page;
 	
-	CGFloat duration = 0.5;
+	CGFloat duration = SLOW_MO;
 	CGRect bounds = _cv.layer.bounds;
 	bounds.origin.x = page * _pageWidth - _cv.contentInset.left;
 	//bounds.origin.x = fmax(0.0, fmin(bounds.origin.x, _cv.contentSize.width - _cv.bounds.size.width));
@@ -245,7 +290,6 @@
 
 	if (animated) {
 		// bounce back
-		
 		[CATransaction begin];
 		[CATransaction setAnimationDuration:duration];
 		[CATransaction setCompletionBlock:^{
@@ -253,6 +297,7 @@
 			if ([_delegate respondsToSelector:@selector(horizontalImageCollectionView:didPageToPage:)])
 				[_delegate horizontalImageCollectionView:self didPageToPage:page];
 			_isPaging = NO;
+			_isAnimating = NO;
 		}];
 		
 		CAKeyframeAnimation *animation = [_cv bouncyAnimationForKeyPath:@"bounds.origin.x"
@@ -264,6 +309,7 @@
 		
 		[CATransaction commit];
 		_cv.contentOffset = bounds.origin;
+		_isAnimating = YES;
 		
 	} else {
 		[_cv setContentOffset:bounds.origin animated:NO];
@@ -355,7 +401,7 @@
 	NSUInteger index = (offsetX - _flowLayout.sectionInset.left / 2.0) / (_flowLayout.itemSize.width + _flowLayout.minimumLineSpacing);
 	//NSLog(@"TAP %d", index);
 	
-	if (!_isPaging) {
+	if (!_isPaging && !_cv.dragging && !_cv.decelerating) {
 		if ([_delegate respondsToSelector:@selector(horizontalImageCollection:didTapImageAtIndex:)]) {
 			[_delegate horizontalImageCollection:self didTapImageAtIndex:index];
 		}
@@ -365,8 +411,19 @@
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-	if ([_delegate respondsToSelector:@selector(horizontalImageCollectionViewDidScroll:)])
-		[_delegate horizontalImageCollectionViewDidScroll:self];
+	if (_isAnimating) {
+		// enable horizontal scrolling while animating; remove bounds animation
+		[_cv.layer removeAnimationForKey:@"bounds.origin.x"];
+	}
+	if ([_delegate respondsToSelector:@selector(pagingCollectionViewDidScroll:)])
+		[_delegate pagingCollectionViewDidScroll:self];
+	
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+	if ([_delegate respondsToSelector:@selector(pagingCollectionViewDidEndDecelerating:)])
+		[_delegate pagingCollectionViewDidEndDecelerating:self];
 	
 }
 
