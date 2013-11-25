@@ -165,26 +165,41 @@
 
 - (void)setScrollEnabled:(BOOL)scrollEnabled
 {
-	_cv.scrollEnabled = YES;
+	_scrollEnabled = scrollEnabled;
+	if (!_pagingEnabled) {
+		_cv.scrollEnabled = scrollEnabled;
+	}
 }
 
-//- (void)setScrollEnabled:(BOOL)scrollEnabled
-//{
-//	_scrollEnabled = scrollEnabled;
-//	if (_scrollEnabled) {
-//		if (!_customGestureRecognizer) {
-//			// enable custom paging
-//			_customGestureRecognizer = [[UIPanGestureRecognizer alloc] init];
-//			[_customGestureRecognizer addTarget:self action:@selector(handleHorizontalPan:)];
-//			_customGestureRecognizer.delegate = self;
-//			_customGestureRecognizer.delaysTouchesBegan = YES;
-//			[_cv addGestureRecognizer:_customGestureRecognizer];
-//		}
-//	} else {
-//		[_cv removeGestureRecognizer:_customGestureRecognizer];
-//		_customGestureRecognizer = nil;
-//	}
-//}
+- (void)setPagingEnabled:(BOOL)pagingEnabled
+{
+	_pagingEnabled = pagingEnabled;
+	if (_pagingEnabled) {
+		if (!_customGestureRecognizer) {
+			// enable custom paging
+			_customGestureRecognizer = [[UIPanGestureRecognizer alloc] init];
+			[_customGestureRecognizer addTarget:self action:@selector(handleHorizontalPan:)];
+			_customGestureRecognizer.delegate = self;
+			_customGestureRecognizer.delaysTouchesBegan = YES;
+			[_cv addGestureRecognizer:_customGestureRecognizer];
+		}
+		
+		// bouncing and scrolling handled by custom gesture recognizer
+		_cv.bounces = NO;
+		_cv.alwaysBounceVertical = NO;
+		_cv.alwaysBounceHorizontal = NO;
+		_cv.scrollEnabled = NO;
+	} else {
+		[_cv removeGestureRecognizer:_customGestureRecognizer];
+		_customGestureRecognizer = nil;
+		
+		// standard scroll view scrolling
+		_cv.bounces = YES;
+		_cv.alwaysBounceVertical = NO;
+		_cv.alwaysBounceHorizontal = YES;
+		_cv.scrollEnabled = _scrollEnabled;
+	}
+}
 
 - (void)reloadData
 {
@@ -230,15 +245,9 @@
 		_cv.dataSource = self;
 		_cv.userInteractionEnabled = YES;
 		
-		// bouncing and scrolling handled by custom gesture recognizer
-		_cv.bounces = YES;
-		_cv.alwaysBounceVertical = NO;
-		_cv.alwaysBounceHorizontal = YES;
+		self.pagingEnabled = NO; // default off
 		_cv.allowsSelection = NO; // needed?
-		_cv.scrollEnabled = NO;
 		_cv.backgroundColor = [UIColor clearColor]; //[UIColor colorWithWhite:0.92 alpha:1.0];
-		
-		// add subview
 		self.backgroundColor = [UIColor clearColor];
 		[self addSubview:_cv];
 

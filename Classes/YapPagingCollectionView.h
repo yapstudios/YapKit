@@ -30,6 +30,7 @@
 - (void)setContentOffset:(CGPoint)contentOffset animated:(BOOL)animated;
 @property (nonatomic, assign) CGFloat interitemSpacing;
 @property (nonatomic, assign) BOOL scrollEnabled;
+@property (nonatomic, assign) BOOL pagingEnabled;
 
 @property (nonatomic, readonly) UICollectionView *collectionView; // TODO: make paging collection view a direct subclass of UICollectionView, or expose more properties
 
