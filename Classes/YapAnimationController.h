@@ -15,7 +15,7 @@ const static CGFloat kYapAnimationControllerDuration = SLOW_MO;
 
 @interface YapAnimationController : NSObject <UIViewControllerAnimatedTransitioning, UIViewControllerInteractiveTransitioning>
 
-@property (nonatomic, assign) BOOL interactionInProgress;
+@property (nonatomic, getter = isInteractionInProgress) BOOL interactionInProgress;
 
 - (void)addPinchGestureRecognizerToController:(UIViewController *)viewController;
 

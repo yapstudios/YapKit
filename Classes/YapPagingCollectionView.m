@@ -269,13 +269,13 @@
 
 - (NSInteger)collectionView:(UICollectionView *)view numberOfItemsInSection:(NSInteger)section;
 {
-	_numberOfItems = [_dataSource numberOfItemsInHorizontalImageCollection:self];
+	_numberOfItems = [_dataSource collectionView:_cv numberOfItemsInSection:section];
     return _numberOfItems;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)cv cellForItemAtIndexPath:(NSIndexPath *)indexPath;
 {
-	UICollectionViewCell *cell = [_dataSource collectionView:self itemAtIndexPath:indexPath];
+	UICollectionViewCell *cell = [_dataSource collectionView:_cv cellForItemAtIndexPath:indexPath];
 	return cell;
 }
 

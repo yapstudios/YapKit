@@ -6,17 +6,19 @@
 //  Copyright (c) 2013 Yap.tv, Inc. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+typedef NS_ENUM(NSInteger, YapPagingCollectionViewStyle) {
+    YapPagingCollectionViewStyleCondensed,
+    YapPagingCollectionViewStyleFullScreen
+};
 
 @class YapPagingCollectionView;
 
 @protocol YapPagingCollectionViewDelegate;
-@protocol YapHorizontalImageCollectionViewDataSource;
 
 @interface YapPagingCollectionView : UIView <UICollectionViewDelegate, UICollectionViewDataSource, UIGestureRecognizerDelegate>
 
 @property (nonatomic, assign) id <YapPagingCollectionViewDelegate> delegate;
-@property (nonatomic, assign) id <YapHorizontalImageCollectionViewDataSource> dataSource;
+@property (nonatomic, assign) id <UICollectionViewDataSource> dataSource;
 
 @property (nonatomic, assign) CGFloat pageWidth;
 @property (nonatomic, readonly) NSUInteger page;
@@ -60,12 +62,3 @@
 - (void)horizontalImageCollectionView:(YapPagingCollectionView *)horizontalImageCollectionView didPageToPage:(NSInteger)page;
 - (void)horizontalImageCollection:(YapPagingCollectionView *)horizontalImageCollectionView didTapImageAtIndex:(NSUInteger)index;
 @end
-
-// data source
-@protocol YapHorizontalImageCollectionViewDataSource <NSObject>
-
-- (NSInteger)numberOfItemsInHorizontalImageCollection:(YapPagingCollectionView *)horizontalImageCollectionView;
-- (UICollectionViewCell *)collectionView:(YapPagingCollectionView *)collectionView itemAtIndexPath:(NSIndexPath *)indexPath;
-
-@end
-
