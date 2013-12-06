@@ -6,11 +6,6 @@
 //  Copyright (c) 2013 Yap.tv, Inc. All rights reserved.
 //
 
-typedef NS_ENUM(NSInteger, YapPagingCollectionViewStyle) {
-    YapPagingCollectionViewStyleCondensed,
-    YapPagingCollectionViewStyleFullScreen
-};
-
 @class YapPagingCollectionView;
 
 @protocol YapPagingCollectionViewDelegate;
