@@ -1,5 +1,5 @@
 //
-//  YapPanInteractiveSwitch.h
+//  YapPanYInteractiveSwitch.h
 //  YapBouncySwitch
 //
 //  Created by Ollie Wagner on 12/9/13.
