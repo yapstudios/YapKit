@@ -38,14 +38,21 @@ typedef enum {
 
 //subclasses must implement these things
 - (UIGestureRecognizer *)gesture;
-- (NSString *)transformKeyPath;
-- (NSNumber *)valueFromGesture:(UIGestureRecognizer *)gesture;
+- (NSArray *)propertyKeyPaths;
+- (NSNumber *)valueFromGesture:(UIGestureRecognizer *)gesture forKeyPath:(NSString *)keyPath;
 - (NSNumber *)identityValue;
+//optional - used for cancelling a switch when the gesture finishes
+- (BOOL)isInteractionValidForGesture:(UIGestureRecognizer *)gesture;
 
 //never call this directly - this is the selector that subclasses should attach to their gesture
 - (void)handleGesture:(UIGestureRecognizer *)gesture;
 
-@property (nonatomic,retain) NSNumber *toValue;
+@property (nonatomic,retain) NSNumber *onValue;
 @property (nonatomic) YapInteractiveSwitchState state;
+
+//Tweaks
+@property (nonatomic) CGFloat slip; //Slip of 0 (Default) moves item 1:1 with gesture. Slip of 1 will not move at all.
+@property (nonatomic) CGFloat friction;
+@property (nonatomic) CGFloat tension;
 
 @end

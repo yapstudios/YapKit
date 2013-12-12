@@ -26,6 +26,9 @@
 	CGFloat _lastValue;
 	CGFloat _velocity;
 	
+	CGFloat _interactiveFriction;
+	CGFloat _interactiveTension;
+	
 	CGFloat _velocityThreshold;
 	CGFloat _baseTransformAmount;
 	
@@ -37,6 +40,12 @@
 	self = [super init];
 	if (self) {
 		_velocityThreshold = 300;
+		_friction = DEFAULT_FRICTION;
+		_tension = DEFAULT_TENSION;
+		
+		_interactiveTension = 5000;
+		_interactiveFriction = 100;
+		
 		targetSelectors = [NSMutableArray array];
 	}
 	return self;
@@ -176,20 +185,25 @@ static float lerp(float p, float a, float b)
 	return lerpDictionary;
 }
 
+- (CGFloat)slip
+{
+	return 1 - _slip;
+}
+
 - (CGFloat)currentValueFromGesture:(UIGestureRecognizer *)gesture
 {
-	return [[self valueFromGesture:gesture] doubleValue] + _baseTransformAmount - [self identityValue].doubleValue;
+	return ([[self valueFromGesture:gesture] doubleValue] * self.slip) + _baseTransformAmount - [self identityValue].doubleValue;
 }
 
 - (CGFloat)percentCompleteOfGesture:(UIGestureRecognizer *)gesture
 {
-	return [self currentValueFromGesture:gesture] / [[self toValue] doubleValue];
+	return [self currentValueFromGesture:gesture] / [[self onValue] doubleValue];
 }
 
 - (CGFloat)percentInterpolatedForViewOfGesture:(UIGestureRecognizer *)gesture
 {
 	CGFloat currValue = [[gesture.view.layer.presentationLayer valueForKeyPath:[self transformKeyPath]] doubleValue];
-	CGFloat percent = (currValue - [self identityValue].doubleValue) / ([self toValue].doubleValue - [self identityValue].doubleValue);
+	CGFloat percent = (currValue - [self identityValue].doubleValue) / ([self onValue].doubleValue - [self identityValue].doubleValue);
 	return percent;
 }
 
@@ -205,15 +219,15 @@ static float lerp(float p, float a, float b)
 
 - (BOOL)shouldTransitionForCurrentVelocity
 {
-	BOOL shouldTransition = [self toValue].doubleValue < 0 && _velocity < -_velocityThreshold;
-	shouldTransition = shouldTransition || ([self toValue].doubleValue >= 0 && _velocity > _velocityThreshold);
+	BOOL shouldTransition = [self onValue].doubleValue < 0 && _velocity < -_velocityThreshold;
+	shouldTransition = shouldTransition || ([self onValue].doubleValue >= 0 && _velocity > _velocityThreshold);
 	return shouldTransition;
 }
 
 - (BOOL)shouldTransitionToRestingStateForCurrentVelocity
 {
-	BOOL shouldTransition = [self toValue].doubleValue < 0 && _velocity > _velocityThreshold;
-	shouldTransition = shouldTransition || ([self toValue].doubleValue >= 0 && _velocity < _velocityThreshold);
+	BOOL shouldTransition = [self onValue].doubleValue < 0 && _velocity > _velocityThreshold;
+	shouldTransition = shouldTransition || ([self onValue].doubleValue >= 0 && _velocity < _velocityThreshold);
 	return shouldTransition;
 }
 
@@ -222,13 +236,13 @@ static float lerp(float p, float a, float b)
 	_baseTransformAmount = [[gesture.view.layer.presentationLayer valueForKeyPath:[self transformKeyPath]] doubleValue];
 }
 
-- (void)animatePerformersWithPercent:(CGFloat)percent
+- (void)animatePerformersWithPercent:(CGFloat)percent friction:(CGFloat)friction tension:(CGFloat)tension
 {
 	for (YapInteractivePerformance *performer in self.performances) {
 		NSDictionary *animationProperties = [self lerpedPropertiesForPerformance:performer percent:percent];
 		//also animate the other actors in the performance
 		for (UIView *coactor in performer.actors) {
-			[coactor.layer animateKeyPathsAndValues:animationProperties];
+			[coactor.layer animateKeyPathsAndValues:animationProperties options:@{YapanimationOptionFriction: @(friction), YapanimationOptionTension: @(tension)} completion:NULL];
 		}
 	}
 }
@@ -238,12 +252,12 @@ static float lerp(float p, float a, float b)
 	//always do these things even if the state hasn't changed
 	if (state == YapInteractiveSwitchStateOff) {
 		//return to identity
-		[_containerView.layer animateKeyPathsAndValues:@{[self transformKeyPath]: [self identityValue]}];
-		[self animatePerformersWithPercent:0];
+		[_containerView.layer animateKeyPathsAndValues:@{[self transformKeyPath]: [self identityValue]} options:@{YapanimationOptionFriction: @(_friction), YapanimationOptionTension: @(_tension)} completion:NULL];
+		[self animatePerformersWithPercent:0 friction:_friction tension:_tension];
 	} else if (state == YapInteractiveSwitchStateOn) {
 		//go to 'to' value
-		[_containerView.layer animateKeyPathsAndValues:@{[self transformKeyPath]: [self toValue]}];
-		[self animatePerformersWithPercent:1.0];
+		[_containerView.layer animateKeyPathsAndValues:@{[self transformKeyPath]: [self onValue]} options:@{YapanimationOptionFriction: @(_friction), YapanimationOptionTension: @(_tension)} completion:NULL];
+		[self animatePerformersWithPercent:1.0 friction:_friction tension:_tension];
 	}
 	
 	
@@ -265,6 +279,11 @@ static float lerp(float p, float a, float b)
 	}
 }
 
+- (BOOL)isInteractionValidForGesture:(UIGestureRecognizer *)gesture
+{
+	return YES;
+}
+
 - (void)handleGesture:(UIGestureRecognizer *)gesture
 {
 	if (gesture.state == UIGestureRecognizerStateBegan) {
@@ -277,9 +296,9 @@ static float lerp(float p, float a, float b)
 	
 	if (gesture.state == UIGestureRecognizerStateChanged) {
 		CGFloat percent = [self percentCompleteOfGesture:gesture];
-		[gesture.view.layer animateKeyPathsAndValues:@{[self transformKeyPath]: @([self currentValueFromGesture:gesture])}];
+		[gesture.view.layer animateKeyPathsAndValues:@{[self transformKeyPath]: @([self currentValueFromGesture:gesture])} options:@{YapanimationOptionFriction: @(_interactiveFriction), YapanimationOptionTension: @(_interactiveTension)} completion:NULL];
 		//start animating to the transform values
-		[self animatePerformersWithPercent:percent];
+		[self animatePerformersWithPercent:percent friction:_interactiveFriction tension:_interactiveTension];
 		//keep a tab on velocity
 		[self calculateVelocityWithCurrentTimeForGesture:gesture];
 		//delegate callback
@@ -289,7 +308,7 @@ static float lerp(float p, float a, float b)
 	}
 	
 	if (gesture.state == UIGestureRecognizerStateEnded) {
-		if ([self shouldTransitionForCurrentVelocity] || ([self percentInterpolatedForViewOfGesture:gesture] > 0.5 && ![self shouldTransitionToRestingStateForCurrentVelocity])) {
+		if ([self isInteractionValidForGesture:gesture] && ([self shouldTransitionForCurrentVelocity] || ([self percentInterpolatedForViewOfGesture:gesture] > 0.5 && ![self shouldTransitionToRestingStateForCurrentVelocity]))) {
 			self.state = YapInteractiveSwitchStateOn;
 		} else {
 			self.state = YapInteractiveSwitchStateOff;
