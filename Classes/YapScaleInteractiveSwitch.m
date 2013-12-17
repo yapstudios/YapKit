@@ -8,12 +8,17 @@
 
 #import "YapScaleInteractiveSwitch.h"
 
-@implementation YapScaleInteractiveSwitch
+@implementation YapScaleInteractiveSwitch {
+    UIPinchGestureRecognizer *_gesture;
+}
 
 - (UIGestureRecognizer *)gesture
 {
-	UIPinchGestureRecognizer *gesture = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handleGesture:)];
-	return gesture;
+	if (!_gesture) {
+        _gesture = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handleGesture:)];
+    }
+	
+    return _gesture;
 }
 
 - (NSString *)transformKeyPath

@@ -9,12 +9,16 @@
 #import "YapRotationInteractiveSwitch.h"
 
 @implementation YapRotationInteractiveSwitch {
+    UIRotationGestureRecognizer *_gesture;
 }
 
 - (UIGestureRecognizer *)gesture
 {
-	UIRotationGestureRecognizer *gesture = [[UIRotationGestureRecognizer alloc] initWithTarget:self action:@selector(handleGesture:)];
-	return gesture;
+    if (!_gesture) {
+        _gesture = [[UIRotationGestureRecognizer alloc] initWithTarget:self action:@selector(handleGesture:)];
+    }
+    
+	return _gesture;
 }
 
 - (NSString *)transformKeyPath

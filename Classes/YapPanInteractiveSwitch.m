@@ -10,6 +10,7 @@
 
 @implementation YapPanInteractiveSwitch {
 	BOOL isXAxis;
+    UIPanGestureRecognizer *_gesture;
 }
 
 NSString *YapPanXAxisString = @"x";
@@ -17,7 +18,7 @@ NSString *YapPanYAxisString = @"y";
 
 - (id)initWithReferenceView:(UIView *)view axis:(NSString *)xOrY
 {
-	self = [self initWithReferenceView:view];
+	self = [super initWithReferenceView:view];
 	if (self) {
 		isXAxis = [xOrY isEqualToString:YapPanXAxisString];
 		_directionLockEnabled = NO;
@@ -28,8 +29,11 @@ NSString *YapPanYAxisString = @"y";
 
 - (UIGestureRecognizer *)gesture
 {
-	UIPanGestureRecognizer *gesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleGesture:)];
-	return gesture;
+    if (!_gesture) {
+        _gesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleGesture:)];
+    }
+
+	return _gesture;
 }
 
 - (NSString *)transformKeyPath
