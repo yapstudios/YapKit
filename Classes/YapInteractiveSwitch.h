@@ -38,8 +38,11 @@ typedef enum {
 
 //subclasses must implement these things
 - (UIGestureRecognizer *)gesture;
-- (NSArray *)propertyKeyPaths;
-- (NSNumber *)valueFromGesture:(UIGestureRecognizer *)gesture forKeyPath:(NSString *)keyPath;
+
+// TODO: Ollie remove/update these.
+//- (NSArray *)propertyKeyPaths;
+//- (NSNumber *)valueFromGesture:(UIGestureRecognizer *)gesture forKeyPath:(NSString *)keyPath;
+
 - (NSNumber *)identityValue;
 //optional - used for cancelling a switch when the gesture finishes
 - (BOOL)isInteractionValidForGesture:(UIGestureRecognizer *)gesture;
