@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "YapKit"
-  s.version      = "0.1"
+  s.version      = "0.0.1"
   s.summary      = "Yap Studios Core Component Framework"
   s.homepage     = "http://yapstudios.com/"
   s.license      = 'None'
@@ -15,5 +15,4 @@ Pod::Spec.new do |s|
 
   s.source_files = 'Classes/*.{h,m}'
   s.header_mappings_dir =  'Classes'
-
 end
