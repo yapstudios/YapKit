@@ -291,6 +291,76 @@
 	return result;
 }
 
+- (NSString *)timeSinceNowAbbreviated
+{
+	// Calculate time string(s)
+	
+	NSTimeInterval ti = [self timeIntervalSinceNow] * -1.0; // num seconds in the past (1 min ago = +60)
+	
+	if (ti < 90) { // Under 90 seconds ago, let's just say "now"
+		ti = 0;
+	}
+	
+	ti = ti/60;
+	NSUInteger minutes = (NSUInteger) ti % 60;
+	ti = ti/60;
+	NSUInteger hours = (NSUInteger) ti % 24;
+	ti = ti/24;
+	NSUInteger days = (NSUInteger) ti;
+	ti = ti/7;
+	NSUInteger weeks = (NSUInteger) ti;
+	
+	NSString *frmt = nil;
+	NSString *result = nil;
+	
+	if (weeks > 1)
+	{
+		frmt = NSLocalizedString(@"%dw ago", @"Relative time indicator for age of object");
+		result = [NSString stringWithFormat:frmt, days];
+	}
+	else if (weeks == 1)
+	{
+		result = NSLocalizedString(@"1w ago", @"");
+	}
+	else if (days > 1) // If this is NOT supposed to be "else if", then document it as so.
+		// Otherwise one would mistake it as a bug, and eagerly "fix" it.
+	{
+		frmt = NSLocalizedString(@"%dd ago", @"Relative time indicator for age of object");
+		result = [NSString stringWithFormat:frmt, days];
+	}
+	else if (days == 1)
+	{
+		result = NSLocalizedString(@"1d ago", @"");
+	}
+	else if (hours > 1)
+	{
+		frmt = NSLocalizedString(@"%dh ago", @"Relative time indicator for age of object");
+		result = [NSString stringWithFormat:frmt, hours];
+	}
+	else if (hours == 1)
+	{
+		result = NSLocalizedString(@"1h ago", @"");
+	}
+	else if (minutes > 1)
+	{
+		frmt = NSLocalizedString(@"%dm ago", @"Relative time indicator for age of object");
+		result = [NSString stringWithFormat:frmt, minutes];
+	}
+	else if (minutes == 1)
+	{
+		result = NSLocalizedString(@"1m ago", @"Relative time indicator for age of object");
+	}
+	else
+	{
+		//	frmt = NSLocalizedString(@"%d secs", @"Relative time indicator for age of object");
+		//	result = [NSString stringWithFormat:frmt, seconds];
+		
+		result = NSLocalizedString(@"<1m ago", @"Relative time indicator for age of object");
+	}
+	
+	return result;
+}
+
 - (NSString *)timeSinceNowCondensedString
 {
 	// Calculate time string(s)

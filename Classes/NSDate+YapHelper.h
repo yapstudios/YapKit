@@ -43,6 +43,7 @@
 - (NSDate *)nextOrThisDayWithWeekday:(NSUInteger)inWeekday;
 
 - (NSString *)timeSinceNowString;
+- (NSString *)timeSinceNowAbbreviated;
 - (NSString *)timeSinceNowCondensedString;
 - (NSString *)timeSinceLastUpdateString;
 
