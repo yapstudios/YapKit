@@ -3,7 +3,8 @@
 // These are automatically optimized by the compiler.
 // Readability is key.
 
-#define FIVE_MINUTES    (60.0 * 5.0)
+#define FIVE_SECONDS   (5.0  *  5.0)
+#define FIVE_MINUTES   (60.0 *  5.0)
 #define TEN_MINTUES    (60.0 * 10.0)
 #define TWENTY_MINTUES (60.0 * 20.0)
 #define THIRTY_MINUTES (60.0 * 30.0)
