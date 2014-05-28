@@ -363,69 +363,54 @@
 
 - (NSString *)timeSinceNowCondensedString
 {
-	// Calculate time string(s)
+	NSDate *now = [NSDate date];
+	NSTimeInterval timePassed = ceil([now timeIntervalSinceDate:self]);
 	
-	NSTimeInterval ti = [self timeIntervalSinceNow] * -1.0; // num seconds in the past (1 min ago = +60)
+	NSString *timeString = nil;
+	NSString *justNowString = NSLocalizedString(@"just now", nil);
+	BOOL shouldAddPluralizer = NO;
 	
-	if (ti < 90) { // Under 90 seconds ago, let's just say "now"
-		ti = 0;
-	}
-	
-	ti = ti/60;
-	NSUInteger minutes = (NSUInteger) ti % 60;
-	ti = ti/60;
-	NSUInteger hours = (NSUInteger) ti % 24;
-	ti = ti/24;
-	NSUInteger days = (NSUInteger) ti;
-	ti = ti/7;
-	NSUInteger weeks = (NSUInteger) ti;
-	
-	NSString *frmt = nil;
-	NSString *result = nil;
-	
-	if (weeks > 1)
-	{
-		frmt = NSLocalizedString(@"%d weeks", @"Relative time indicator for age of object");
-		result = [NSString stringWithFormat:frmt, days];
-	}
-	else if (weeks == 1)
-	{
-		result = NSLocalizedString(@"1 week", @"");
-	}
-	else if (days > 1) // If this is NOT supposed to be "else if", then document it as so.
-	                   // Otherwise one would mistake it as a bug, and eagerly "fix" it.
-	{
-		frmt = NSLocalizedString(@"%d days", @"Relative time indicator for age of object");
-		result = [NSString stringWithFormat:frmt, days];
-	}
-	else if (days == 1)
-	{
-		result = NSLocalizedString(@"1 day", @"");
-	}
-	else if (hours > 1)
-	{
-		frmt = NSLocalizedString(@"%d hours", @"Relative time indicator for age of object");
-		result = [NSString stringWithFormat:frmt, hours];
-	}
-	else if (hours == 1)
-	{
-		result = NSLocalizedString(@"1 hour", @"");
-	}
-	else if (minutes > 1)
-	{
-		frmt = NSLocalizedString(@"%d mins", @"Relative time indicator for age of object");
-		result = [NSString stringWithFormat:frmt, minutes];
-	}
-	else if (minutes == 1)
-	{
-		result = NSLocalizedString(@"1 min", @"Relative time indicator for age of object");
-	}
-	else
-	{
-		result = NSLocalizedString(@"Just now", @"Relative time indicator for age of object");
+	if (timePassed > 60 * 60 * 24 * 7 * 4 * 12) { //greater than a year
+		timePassed = timePassed / 60.0 / 60.0 / 24.0 / 7.0 / 4.0 / 12.0;
+		timeString = NSLocalizedString(@"year", @"year abbr.");
+		shouldAddPluralizer = YES;
+	} else if (timePassed > 60 * 60 * 24 * 7 * 4) { //greater than a month
+		timePassed = timePassed / 60.0 / 60.0 / 24.0 / 7.0 / 4.0;
+		timeString = NSLocalizedString(@"month", @"month abbr.");
+		shouldAddPluralizer = YES;
+	} else if (timePassed > 60 * 60 * 24 * 7) { //greater than a week
+		timePassed = timePassed / 60.0 / 60.0 / 24.0 / 7.0;
+		timeString = NSLocalizedString(@"week", @"week abbr.");
+		shouldAddPluralizer = YES;
+	} else if (timePassed > 60 * 60 * 24) { //greater than a day
+		timePassed = timePassed / 60.0 / 60.0 / 24.0;
+		timeString = NSLocalizedString(@"day", @"day abbr.");
+		shouldAddPluralizer = YES;
+	} else if (timePassed > 60 * 60) { //greater than an hour
+		timePassed = timePassed / 60.0 / 60.0;
+		timeString = NSLocalizedString(@"hr", @"hour abbr.");
+		shouldAddPluralizer = YES;
+	} else if (timePassed > 60) { //greater than a minute
+		timePassed = timePassed / 60.0;
+		timeString = NSLocalizedString(@"min", @"minute abbr.");
+		shouldAddPluralizer = NO;
+	} else {
+		timePassed = 0;
+		timeString = justNowString;
 	}
 	
-	return result;
+	NSString *timestampString = [timeString copy];
+	NSString *durationString = [[NSString alloc] initWithFormat:@"%i", (int)timePassed];
+	
+	if (![timeString isEqualToString:justNowString]) {
+		timestampString = [NSString stringWithFormat:@"%@ %@", durationString, timeString];
+	}
+	
+	if ((int)timePassed != 1 && shouldAddPluralizer) {
+		timestampString = [NSString stringWithFormat:@"%@s", timestampString];
+	}
+	
+	return timestampString;
 }
 
 /**
