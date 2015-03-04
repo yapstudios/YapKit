@@ -55,7 +55,7 @@ NSString *YapPanYAxisString = @"y";
 {
 	BOOL isValid = YES;
 	if (_directionLockEnabled) {
-		isValid = (isXAxis ? fabsf([gesture translationInView:gesture.view.superview].y) : fabsf([gesture translationInView:gesture.view.superview].x)) < _directionLockThreshold;
+		isValid = (isXAxis ? fabs([gesture translationInView:gesture.view.superview].y) : fabs([gesture translationInView:gesture.view.superview].x)) < _directionLockThreshold;
 	}
 	return isValid;
 }
