@@ -71,7 +71,7 @@
 	
 	NSCalendar *calendar = [YapCalendar cachedAutoupdatingCurrentCalendar];
 	
-	NSUInteger components = NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit;
+	NSUInteger components = NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay;
 	
 	NSDateComponents *selfDateComponents = [calendar components:components fromDate:self];
 	NSDateComponents *anotherDateComponents = [calendar components:components fromDate:another];
@@ -95,43 +95,43 @@
 - (NSInteger)year
 {
 	NSCalendar *calendar = [YapCalendar cachedAutoupdatingCurrentCalendar];
-	return [[calendar components:NSYearCalendarUnit fromDate:self] year];
+	return [[calendar components:NSCalendarUnitYear fromDate:self] year];
 }
 
 - (NSInteger)month
 {
 	NSCalendar *calendar = [YapCalendar cachedAutoupdatingCurrentCalendar];
-	return [[calendar components:NSMonthCalendarUnit fromDate:self] month];
+	return [[calendar components:NSCalendarUnitMonth fromDate:self] month];
 }
 
 - (NSInteger)day
 {
 	NSCalendar *calendar = [YapCalendar cachedAutoupdatingCurrentCalendar];
-	return [[calendar components:NSDayCalendarUnit fromDate:self] day];
+	return [[calendar components:NSCalendarUnitDay fromDate:self] day];
 }
 
 - (NSInteger)weekday
 {
 	NSCalendar *calendar = [YapCalendar cachedAutoupdatingCurrentCalendar];
-	return [[calendar components:NSWeekdayCalendarUnit fromDate:self] weekday];
+	return [[calendar components:NSCalendarUnitWeekday fromDate:self] weekday];
 }
 
 - (NSInteger)hour
 {
 	NSCalendar *calendar = [YapCalendar cachedAutoupdatingCurrentCalendar];
-	return [[calendar components:NSHourCalendarUnit fromDate:self] hour];
+	return [[calendar components:NSCalendarUnitHour fromDate:self] hour];
 }
 
 - (NSInteger)minute
 {
 	NSCalendar *calendar = [YapCalendar cachedAutoupdatingCurrentCalendar];
-	return [[calendar components:NSMinuteCalendarUnit fromDate:self] minute];
+	return [[calendar components:NSCalendarUnitMinute fromDate:self] minute];
 }
 
 - (NSInteger)second
 {
 	NSCalendar *calendar = [YapCalendar cachedAutoupdatingCurrentCalendar];
-	return [[calendar components:NSSecondCalendarUnit fromDate:self] second];
+	return [[calendar components:NSCalendarUnitSecond fromDate:self] second];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -142,7 +142,7 @@
 {
 	NSCalendar *calendar = [YapCalendar cachedAutoupdatingCurrentCalendar];
 	
-	NSUInteger components = NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit | NSHourCalendarUnit;
+	NSUInteger components = NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour;
 	
 	NSDateComponents *dateComponents = [calendar components:components fromDate:self];
 	
@@ -163,7 +163,7 @@
 {
 	NSCalendar *calendar = [YapCalendar cachedAutoupdatingCurrentCalendar];
 	
-	NSUInteger components = NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit | NSHourCalendarUnit;
+	NSUInteger components = NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour;
 	
 	NSDateComponents *dateComponents = [calendar components:components fromDate:self];
 	
@@ -184,7 +184,7 @@
 {
 	NSCalendar *calendar = [YapCalendar cachedAutoupdatingCurrentCalendar];
 	
-	NSUInteger components = NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit | NSHourCalendarUnit;
+	NSUInteger components = NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour;
 	
 	NSDateComponents *dateComponents = [calendar components:components fromDate:self];
 	
@@ -494,7 +494,7 @@
 	
 	NSCalendar *calendar = [YapCalendar cachedAutoupdatingCurrentCalendar];
 	
-	NSUInteger components = NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit;
+	NSUInteger components = NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay;
 	NSDateComponents *dateComponents = [calendar components:components fromDate:today];
 	dateComponents.hour = 0;
 	dateComponents.minute = 0;
