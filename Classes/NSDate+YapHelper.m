@@ -403,7 +403,7 @@
 	NSString *durationString = [[NSString alloc] initWithFormat:@"%i", (int)timePassed];
 	
 	if (![timeString isEqualToString:justNowString]) {
-		timestampString = [NSString stringWithFormat:@"%@ %@", durationString, timeString];
+		timestampString = [NSString stringWithFormat:@"%@\u00a0%@", durationString, timeString];
 	}
 	
 	if ((int)timePassed != 1 && shouldAddPluralizer) {
