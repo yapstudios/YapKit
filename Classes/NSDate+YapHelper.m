@@ -245,47 +245,47 @@
 	
 	if (weeks > 1)
 	{
-		frmt = NSLocalizedString(@"%d weeks ago", @"Relative time indicator for age of object");
+		frmt = NSLocalizedStringFromTable(@"%d weeks ago", @"YapKit", @"{Number} weeks ago");
 		result = [NSString stringWithFormat:frmt, days];
 	}
 	else if (weeks == 1)
 	{
-		result = NSLocalizedString(@"1 week ago", @"");
+		result = NSLocalizedStringFromTable(@"1 week ago", @"YapKit", @"1 week ago");
 	}
 	else if (days > 1) // If this is NOT supposed to be "else if", then document it as so.
 	                   // Otherwise one would mistake it as a bug, and eagerly "fix" it.
 	{
-		frmt = NSLocalizedString(@"%d days ago", @"Relative time indicator for age of object");
+		frmt = NSLocalizedStringFromTable(@"%d days ago", @"YapKit", @"{Number} days ago");
 		result = [NSString stringWithFormat:frmt, days];
 	}
 	else if (days == 1)
 	{
-		result = NSLocalizedString(@"1 day ago", @"");
+		result = NSLocalizedStringFromTable(@"1 day ago", @"YapKit", @"1 day ago");
 	}
 	else if (hours > 1)
 	{
-		frmt = NSLocalizedString(@"%d hours ago", @"Relative time indicator for age of object");
+		frmt = NSLocalizedStringFromTable(@"%d hours ago", @"YapKit", @"{Number} hours ago");
 		result = [NSString stringWithFormat:frmt, hours];
 	}
 	else if (hours == 1)
 	{
-		result = NSLocalizedString(@"1 hour ago", @"");
+		result = NSLocalizedStringFromTable(@"1 hour ago", @"YapKit", @"1 hour ago");
 	}
 	else if (minutes > 1)
 	{
-		frmt = NSLocalizedString(@"%d minutes ago", @"Relative time indicator for age of object");
+		frmt = NSLocalizedStringFromTable(@"%d minutes ago", @"YapKit", @"{Number} minutes ago");
 		result = [NSString stringWithFormat:frmt, minutes];
 	}
 	else if (minutes == 1)
 	{
-		result = NSLocalizedString(@"1 minute ago", @"Relative time indicator for age of object");
+		result = NSLocalizedStringFromTable(@"1 minute ago", @"YapKit", @"1 minute ago");
 	}
 	else
 	{
-	//	frmt = NSLocalizedString(@"%d secs", @"Relative time indicator for age of object");
+	//	frmt = NSLocalizedStringFromTable(@"%d secs", @"YapKit", @"Relative time indicator for age of object");
 	//	result = [NSString stringWithFormat:frmt, seconds];
 		
-		result = NSLocalizedString(@"Just now", @"Relative time indicator for age of object");
+		result = NSLocalizedStringFromTable(@"Just now", @"YapKit", @"Happened only a moment ago");
 	}
 	
 	return result;
@@ -315,47 +315,47 @@
 	
 	if (weeks > 1)
 	{
-		frmt = NSLocalizedString(@"%dw ago", @"Relative time indicator for age of object");
+		frmt = NSLocalizedStringFromTable(@"%dw ago", @"YapKit", @"Abbreviated: {Number}w ago ({Number} weeks ago)");
 		result = [NSString stringWithFormat:frmt, days];
 	}
 	else if (weeks == 1)
 	{
-		result = NSLocalizedString(@"1w ago", @"");
+		result = NSLocalizedStringFromTable(@"1w ago", @"YapKit", @"Abbreviated: 1w ago (1 week ago)");
 	}
 	else if (days > 1) // If this is NOT supposed to be "else if", then document it as so.
 		// Otherwise one would mistake it as a bug, and eagerly "fix" it.
 	{
-		frmt = NSLocalizedString(@"%dd ago", @"Relative time indicator for age of object");
+		frmt = NSLocalizedStringFromTable(@"%dd ago", @"YapKit", @"Abbreviated: {Number}d ago ({Number} days ago)");
 		result = [NSString stringWithFormat:frmt, days];
 	}
 	else if (days == 1)
 	{
-		result = NSLocalizedString(@"1d ago", @"");
+		result = NSLocalizedStringFromTable(@"1d ago", @"YapKit", @"Abbreviated: 1d ago (1 day ago)");
 	}
 	else if (hours > 1)
 	{
-		frmt = NSLocalizedString(@"%dh ago", @"Relative time indicator for age of object");
+		frmt = NSLocalizedStringFromTable(@"%dh ago", @"YapKit", @"Abbreviated: {Number}h ago ({Number} hours ago)");
 		result = [NSString stringWithFormat:frmt, hours];
 	}
 	else if (hours == 1)
 	{
-		result = NSLocalizedString(@"1h ago", @"");
+		result = NSLocalizedStringFromTable(@"1h ago", @"YapKit", @"Abbreviated: 1h ago (1 hour ago)");
 	}
 	else if (minutes > 1)
 	{
-		frmt = NSLocalizedString(@"%dm ago", @"Relative time indicator for age of object");
+		frmt = NSLocalizedStringFromTable(@"%dm ago", @"YapKit", @"Abbreviated: {Number}m ago ({Number} minutes ago)");
 		result = [NSString stringWithFormat:frmt, minutes];
 	}
 	else if (minutes == 1)
 	{
-		result = NSLocalizedString(@"1m ago", @"Relative time indicator for age of object");
+		result = NSLocalizedStringFromTable(@"1m ago", @"YapKit", @"Abbreviated: 1m ago (1 minute ago)");
 	}
 	else
 	{
-		//	frmt = NSLocalizedString(@"%d secs", @"Relative time indicator for age of object");
+		//	frmt = NSLocalizedStringFromTable(@"%d secs", @"YapKit", @"Relative time indicator for age of object");
 		//	result = [NSString stringWithFormat:frmt, seconds];
 		
-		result = NSLocalizedString(@"<1m ago", @"Relative time indicator for age of object");
+		result = NSLocalizedStringFromTable(@"<1m ago", @"YapKit", @"Abbreviated: <1h ago (less than 1 hour ago)");
 	}
 	
 	return result;
@@ -367,32 +367,32 @@
 	NSTimeInterval timePassed = ceil([now timeIntervalSinceDate:self]);
 	
 	NSString *timeString = nil;
-	NSString *justNowString = NSLocalizedString(@"just now", nil);
+	NSString *justNowString = NSLocalizedStringFromTable(@"just now", @"YapKit", @"Happened only a moment ago");
 	BOOL shouldAddPluralizer = NO;
 	
 	if (timePassed > 60 * 60 * 24 * 7 * 4 * 12) { //greater than a year
 		timePassed = timePassed / 60.0 / 60.0 / 24.0 / 7.0 / 4.0 / 12.0;
-		timeString = NSLocalizedString(@"year", @"year abbr.");
+		timeString = NSLocalizedStringFromTable(@"year", @"YapKit", @"year abbr.");
 		shouldAddPluralizer = YES;
 	} else if (timePassed > 60 * 60 * 24 * 7 * 4) { //greater than a month
 		timePassed = timePassed / 60.0 / 60.0 / 24.0 / 7.0 / 4.0;
-		timeString = NSLocalizedString(@"month", @"month abbr.");
+		timeString = NSLocalizedStringFromTable(@"month", @"YapKit", @"month abbr.");
 		shouldAddPluralizer = YES;
 	} else if (timePassed > 60 * 60 * 24 * 7) { //greater than a week
 		timePassed = timePassed / 60.0 / 60.0 / 24.0 / 7.0;
-		timeString = NSLocalizedString(@"week", @"week abbr.");
+		timeString = NSLocalizedStringFromTable(@"week", @"YapKit", @"week abbr.");
 		shouldAddPluralizer = YES;
 	} else if (timePassed > 60 * 60 * 24) { //greater than a day
 		timePassed = timePassed / 60.0 / 60.0 / 24.0;
-		timeString = NSLocalizedString(@"day", @"day abbr.");
+		timeString = NSLocalizedStringFromTable(@"day", @"YapKit", @"day abbr.");
 		shouldAddPluralizer = YES;
 	} else if (timePassed > 60 * 60) { //greater than an hour
 		timePassed = timePassed / 60.0 / 60.0;
-		timeString = NSLocalizedString(@"hr", @"hour abbr.");
+		timeString = NSLocalizedStringFromTable(@"hr", @"YapKit", @"hour abbr.");
 		shouldAddPluralizer = YES;
 	} else if (timePassed > 60) { //greater than a minute
 		timePassed = timePassed / 60.0;
-		timeString = NSLocalizedString(@"min", @"minute abbr.");
+		timeString = NSLocalizedStringFromTable(@"min", @"YapKit", @"minute abbr.");
 		shouldAddPluralizer = NO;
 	} else {
 		timePassed = 0;
@@ -440,44 +440,44 @@
 	
 	if (weeks > 1)
 	{
-		frmt = NSLocalizedString(@"Last updated %d weeks ago", @"Relative time indicator of time since last update");
+		frmt = NSLocalizedStringFromTable(@"Last updated %d weeks ago", @"YapKit", @"Relative time indicator of time since last update");
 		result = [NSString stringWithFormat:frmt, days];
 	}
 	else if (weeks == 1)
 	{
-		result = NSLocalizedString(@"Last updated 1 week ago", @"");
+		result = NSLocalizedStringFromTable(@"Last updated 1 week ago", @"YapKit", @"");
 	}
 	else if (days > 1) // If this is NOT supposed to be "else if", then document it as so.
 	                   // Otherwise one would mistake it as a bug, and eagerly "fix" it.
 	{
-		frmt = NSLocalizedString(@"Last updated %d days ago", @"Relative time indicator of time since last update");
+		frmt = NSLocalizedStringFromTable(@"Last updated %d days ago", @"YapKit", @"Relative time indicator of time since last update");
 		result = [NSString stringWithFormat:frmt, days];
 	}
 	else if (days == 1)
 	{
-		result = NSLocalizedString(@"Last updated 1 day ago", @"Relative time indicator of time since last update");
+		result = NSLocalizedStringFromTable(@"Last updated 1 day ago", @"YapKit", @"Relative time indicator of time since last update");
 	}
 	else if (hours > 1)
 	{
-		frmt = NSLocalizedString(@"Last updated %d hours ago", @"Relative time indicator of time since last update");
+		frmt = NSLocalizedStringFromTable(@"Last updated %d hours ago", @"YapKit", @"Relative time indicator of time since last update");
 		result = [NSString stringWithFormat:frmt, hours];
 	}
 	else if (hours == 1)
 	{
-		result = NSLocalizedString(@"Last updated 1 hour ago", @"Relative time indicator of time since last update");
+		result = NSLocalizedStringFromTable(@"Last updated 1 hour ago", @"YapKit", @"Relative time indicator of time since last update");
 	}
 	else if (minutes > 1)
 	{
-		frmt = NSLocalizedString(@"Last updated %d minutes ago", @"Relative time indicator of time since last update");
+		frmt = NSLocalizedStringFromTable(@"Last updated %d minutes ago", @"YapKit", @"Relative time indicator of time since last update");
 		result = [NSString stringWithFormat:frmt, minutes];
 	}
 	else if (minutes == 1)
 	{
-		result = NSLocalizedString(@"Last updated 1 minute ago", @"Relative time indicator of time since last update");
+		result = NSLocalizedStringFromTable(@"Last updated 1 minute ago", @"YapKit", @"Relative time indicator of time since last update");
 	}
 	else
 	{
-		result = NSLocalizedString(@"Just updated", @"Relative time indicator of time since last update");
+		result = NSLocalizedStringFromTable(@"Just updated", @"YapKit", @"Relative time indicator of time since last update");
 	}
 	
 	return result;
