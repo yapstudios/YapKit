@@ -487,7 +487,7 @@ static YapImageManager *_sharedInstance;
 		}
 	};
 	
-    NSURLSessionDataTask *task = [_sessionManager GET:imageRequest.URLString parameters:parameters success:successBlock failure:failureBlock];
+    NSURLSessionDataTask *task = [_sessionManager GET:imageRequest.URLString parameters:parameters progress:NULL success:successBlock failure:failureBlock];
 	
 	// save pointer to download progress
 	imageRequest.progress = [_sessionManager downloadProgressForTask:task];
@@ -1591,7 +1591,7 @@ inline static NSTimeInterval CGImageSourceGetGifFrameDelay(CGImageSourceRef imag
 		}
 	};
 	
-    NSURLSessionDataTask *task = [_sessionManager GET:movieRequest.URLString parameters:parameters success:successBlock failure:failureBlock];
+    NSURLSessionDataTask *task = [_sessionManager GET:movieRequest.URLString parameters:parameters progress:NULL success:successBlock failure:failureBlock];
 	
 	// save pointer to download progress
 	movieRequest.progress = [_sessionManager downloadProgressForTask:task];
@@ -1641,7 +1641,7 @@ inline static NSTimeInterval CGImageSourceGetGifFrameDelay(CGImageSourceRef imag
 		}
 	};
 	
-    NSURLSessionDataTask *task = [_MP4SessionManager GET:movieRequest.movieURLString parameters:parameters success:successBlock failure:failureBlock];
+    NSURLSessionDataTask *task = [_MP4SessionManager GET:movieRequest.movieURLString parameters:parameters progress:NULL success:successBlock failure:failureBlock];
 	
 	// save pointer to download progress
 	movieRequest.progress = [_MP4SessionManager downloadProgressForTask:task];
@@ -1710,7 +1710,7 @@ inline static NSTimeInterval CGImageSourceGetGifFrameDelay(CGImageSourceRef imag
 		}
 	};
 	
-    [_gfycatSessionManager GET:URLString parameters:parameters success:successBlock failure:failureBlock];
+    [_gfycatSessionManager GET:URLString parameters:parameters progress:NULL success:successBlock failure:failureBlock];
 	
 }
 
