@@ -28,7 +28,7 @@
 // TODO: currently accessing private variables; move to more complex subclassing
 @interface AFURLSessionManagerTaskDelegate : NSObject
 @property (nonatomic, strong) NSMutableData *mutableData;
-@property (nonatomic, strong) NSProgress *progress;
+@property (nonatomic, strong) NSProgress *downloadProgress;
 @end
 
 @interface YapImageSessionManager (private)
@@ -46,7 +46,7 @@
 
 - (NSProgress *)downloadProgressForTask:(NSURLSessionTask *)task {
 	AFURLSessionManagerTaskDelegate *delegate = [self delegateForTask:task];
-    return [delegate progress];
+    return [delegate downloadProgress];
 }
 
 
@@ -156,8 +156,8 @@
 			// skip
 		} else {
 			[_imageDownloadProgressCache setObject:@(roundedProgress) forKey:key];
-			delegate.progress.totalUnitCount = (int64_t) 10;
-			delegate.progress.completedUnitCount = (int64_t) roundedProgress;
+			delegate.downloadProgress.totalUnitCount = (int64_t) 10;
+			delegate.downloadProgress.completedUnitCount = (int64_t) roundedProgress;
 		}
 	}
 }
