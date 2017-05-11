@@ -1,2 +1,2 @@
-# YapBites
-Code à la carte
+# YapKit
+Yap Studios General Purpose Utilities
