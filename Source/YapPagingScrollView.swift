@@ -11,7 +11,7 @@ import Foundation
 // To use, set the YapPagingScrollView bounds to the itemsize plus any minimum line spacing. 
 // Set the contentView to your collection view. If there is a left content inset, apply a negative x offset to the content view frame (the collection view)
 // The contentView (collection view) bounds should be the full width of the parent view.
-public class YapPagingScrollView: UIScrollView {
+open class YapPagingScrollView: UIScrollView {
 	
 	public var contentView: UIScrollView? {
 		willSet(newContentView) {
@@ -49,7 +49,7 @@ public class YapPagingScrollView: UIScrollView {
 		alwaysBounceHorizontal = true
 	}
 
-	override public func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+	override open func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
 		if let contentView = self.contentView {
 			if contentView.point(inside: point, with: event) {
 				return true
@@ -58,7 +58,7 @@ public class YapPagingScrollView: UIScrollView {
 		return super.point(inside: point, with: event)
 	}
 	
-	override public func layoutSubviews() {
+	override open func layoutSubviews() {
 		super.layoutSubviews()
 		
 		guard let contentView = self.contentView else { return }
