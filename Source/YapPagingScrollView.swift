@@ -13,7 +13,7 @@ import Foundation
 // The contentView (collection view) bounds should be the full width of the parent view.
 open class YapPagingScrollView: UIScrollView {
 	
-	public var contentView: UIScrollView? {
+	public var contentView: UICollectionView? {
 		willSet(newContentView) {
 			if let contentView = self.contentView {
 				contentView.removeFromSuperview()
